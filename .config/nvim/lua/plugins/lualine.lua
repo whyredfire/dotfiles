@@ -7,6 +7,9 @@ return {
           options = {
               icons_enabled = true,
               theme = 'auto',
+              disabled_filetypes = {'NvimTree'},
+              ignore_focus = {'NvimTree'},
+              globalstatus = true,
           }
       },
   },
