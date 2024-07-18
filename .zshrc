@@ -1,34 +1,24 @@
-# Path to your Oh My Zsh installation.
-export ZSH="$HOME/.oh-my-zsh"
+export PATH="/opt/homebrew/opt/curl/bin:$PATH"
 
-# oh-my-zsh theme
-ZSH_THEME="robbyrussell"
-
-# display red dots whilst waiting for completion.
-COMPLETION_WAITING_DOTS="true"
-
-# disable marking untracked files under VCS as dirty
-DISABLE_UNTRACKED_FILES_DIRTY="true"
-
-# enable timestamps in history
-HIST_STAMPS="mm/dd/yyyy"
-
-# plugins
-plugins=(
-    git
-    zsh-autosuggestions
-    zsh-syntax-highlighting
-    zsh-completions
-)
-
-source $ZSH/oh-my-zsh.sh
-
-# User configuration
-
-# aliases
-alias c='clear'
-
-# launch tmux on init
-if [ -n "$PS1" ] && [ -z "$TMUX" ]; then
-    tmux attach -t main || tmux new -s main
+# eval oh-my-posh
+if [ "$TERM_PROGRAM" != "Apple_Terminal" ]; then
+  eval "$(oh-my-posh init zsh --config ~/.config/oh-my-posh/custom.toml)"
 fi
+
+# zsh users stuff
+source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source ~/.zsh/zsh-history-substring-search/zsh-history-substring-search.zsh
+
+fpath=(~/.zsh/zsh-autocompletions/src $fpath)
+
+# disable substring highlight
+HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND=''
+HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_NOT_FOUND=''
+
+# keybinds
+bindkey '^[[A' history-substring-search-up
+bindkey '^[[B' history-substring-search-down
+
+# alias
+alias ls='ls -G'
