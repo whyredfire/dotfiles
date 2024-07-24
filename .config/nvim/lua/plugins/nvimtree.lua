@@ -11,7 +11,7 @@ return {
         keys = {
             {
                 "<C-n>",
-                ":NvimTreeToggle<cr>",
+                "<cmd>:NvimTreeToggle<cr>",
                 desc = "Toggle Nvim tree",
                 mode = 'n',
             },
