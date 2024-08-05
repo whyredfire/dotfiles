@@ -10,12 +10,6 @@ export ZSH="$HOME/.oh-my-zsh"
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 ZSH_THEME="robbyrussell"
 
-# Set list of themes to pick from when loading at random
-# Setting this variable when ZSH_THEME=random will cause zsh to load
-# a theme from this variable instead of looking in $ZSH/themes/
-# If set to an empty array, this variable will have no effect.
-# ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
-
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
 
@@ -41,18 +35,18 @@ ZSH_THEME="robbyrussell"
 # DISABLE_AUTO_TITLE="true"
 
 # Uncomment the following line to enable command auto-correction.
-# ENABLE_CORRECTION="true"
+ENABLE_CORRECTION="true"
 
 # Uncomment the following line to display red dots whilst waiting for completion.
 # You can also set it to another string to have that shown instead of the default red dots.
 # e.g. COMPLETION_WAITING_DOTS="%F{yellow}waiting...%f"
 # Caution: this setting can cause issues with multiline prompts in zsh < 5.7.1 (see #5765)
-# COMPLETION_WAITING_DOTS="true"
+COMPLETION_WAITING_DOTS="true"
 
 # Uncomment the following line if you want to disable marking untracked files
 # under VCS as dirty. This makes repository status check for large repositories
 # much, much faster.
-# DISABLE_UNTRACKED_FILES_DIRTY="true"
+DISABLE_UNTRACKED_FILES_DIRTY="true"
 
 # Uncomment the following line if you want to change the command execution time
 # stamp shown in the history command output.
@@ -60,10 +54,7 @@ ZSH_THEME="robbyrussell"
 # "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
 # or set a custom format using the strftime function format specifications,
 # see 'man strftime' for details.
-# HIST_STAMPS="mm/dd/yyyy"
-
-# Would you like to use another custom folder than $ZSH/custom?
-# ZSH_CUSTOM=/path/to/new-custom-folder
+HIST_STAMPS="mm/dd/yyyy"
 
 # Which plugins would you like to load?
 # Standard plugins can be found in $ZSH/plugins/
@@ -81,21 +72,6 @@ source $ZSH/oh-my-zsh.sh
 
 # User configuration
 
-# export MANPATH="/usr/local/man:$MANPATH"
-
-# You may need to manually set your language environment
-# export LANG=en_US.UTF-8
-
-# Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
-# else
-#   export EDITOR='mvim'
-# fi
-
-# Compilation flags
-# export ARCHFLAGS="-arch x86_64"
-
 # Set personal aliases, overriding those provided by Oh My Zsh libs,
 # plugins, and themes. Aliases can be placed here, though Oh My Zsh
 # users are encouraged to define aliases within a top-level file in
@@ -104,8 +80,42 @@ source $ZSH/oh-my-zsh.sh
 # - $ZSH_CUSTOM/macos.zsh
 # For a full list of active aliases, run `alias`.
 #
-# Example aliases
+# aliases
 alias c="clear"
+alias clear="echo -n -e '\e[2J\e[3J\e[1;1H'"
+alias ff="fastfetch"
+
+## configs
 alias tmuxconf="nvim ~/.config/tmux/tmux.conf"
 alias nvimconf="cd ~/.config/nvim && nvim && cd -"
 alias zshconf="nvim ~/.zshrc"
+alias ffconf="nvim ~/.config/fastfetch/config.jsonc"
+
+# source env secrets
+source ~/.env
+
+function kat() {
+    if [ -z "$1" ]; then
+        echo "Usage: $0 <file_path>"
+        exit 1
+    fi
+
+    if [ ! -f "$1" ]; then
+        echo "File not found: $1"
+        exit 1
+    fi
+
+    paste_content=$(cat "$1")
+
+    custom_url=$(openssl rand -base64 12 | tr -dc 'A-Za-z0-9')
+
+    response=$(curl -s -X POST https://katb.in/ \
+        -H "Content-Type: application/x-www-form-urlencoded" \
+        -H "Cookie: $kat_cookie" \
+        --data-urlencode "_csrf_token=$kat_csrf_token" \
+        --data-urlencode "paste[content]=$paste_content" \
+        --data-urlencode "paste[custom_url]=$custom_url" \
+        -w "%{redirect_url}")
+
+    echo "https://katb.in/$custom_url"
+}
