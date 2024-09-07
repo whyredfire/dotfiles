@@ -91,6 +91,9 @@ alias nvimconf="cd ~/.config/nvim && nvim && cd -"
 alias zshconf="nvim ~/.zshrc"
 alias ffconf="nvim ~/.config/fastfetch/config.jsonc"
 
+# Set bat theme
+BAT_THEME="Catppuccin Mocha"
+
 # source env secrets
 source ~/.env
 
