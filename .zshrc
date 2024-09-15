@@ -90,6 +90,7 @@ alias tmuxconf="nvim ~/.config/tmux/tmux.conf"
 alias nvimconf="cd ~/.config/nvim && nvim && cd -"
 alias zshconf="nvim ~/.zshrc"
 alias ffconf="nvim ~/.config/fastfetch/config.jsonc"
+alias g++="g++ -std=c++11"
 
 # Set bat theme
 BAT_THEME="Catppuccin Mocha"
