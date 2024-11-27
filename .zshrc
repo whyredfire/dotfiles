@@ -17,14 +17,6 @@ ZSH_THEME="fishy"
 # Case-sensitive completion must be off. _ and - will be interchangeable.
 # HYPHEN_INSENSITIVE="true"
 
-# Uncomment one of the following lines to change the auto-update behavior
-# zstyle ':omz:update' mode disabled  # disable automatic updates
-# zstyle ':omz:update' mode auto      # update automatically without asking
-# zstyle ':omz:update' mode reminder  # just remind me to update when it's time
-
-# Uncomment the following line to change how often to auto-update (in days).
-# zstyle ':omz:update' frequency 13
-
 # Uncomment the following line if pasting URLs and other text is messed up.
 # DISABLE_MAGIC_FUNCTIONS="true"
 
@@ -35,7 +27,7 @@ ZSH_THEME="fishy"
 # DISABLE_AUTO_TITLE="true"
 
 # Uncomment the following line to enable command auto-correction.
-#ENABLE_CORRECTION="true"
+# ENABLE_CORRECTION="true"
 
 # Uncomment the following line to display red dots whilst waiting for completion.
 # You can also set it to another string to have that shown instead of the default red dots.
@@ -72,6 +64,16 @@ source $ZSH/oh-my-zsh.sh
 
 # User configuration
 
+# Preferred editor for local and remote sessions
+# if [[ -n $SSH_CONNECTION ]]; then
+#   export EDITOR='vim'
+# else
+#   export EDITOR='nvim'
+# fi
+
+# Compilation flags
+# export ARCHFLAGS="-arch $(uname -m)"
+
 # Set personal aliases, overriding those provided by Oh My Zsh libs,
 # plugins, and themes. Aliases can be placed here, though Oh My Zsh
 # users are encouraged to define aliases within a top-level file in
@@ -80,7 +82,7 @@ source $ZSH/oh-my-zsh.sh
 # - $ZSH_CUSTOM/macos.zsh
 # For a full list of active aliases, run `alias`.
 #
-# aliases
+# custom alias
 alias c="clear"
 alias clear="echo -n -e '\e[2J\e[3J\e[1;1H'"
 alias ff="fastfetch"
@@ -91,22 +93,31 @@ alias nvimconf="cd ~/.config/nvim && nvim && cd -"
 alias zshconf="nvim ~/.zshrc"
 alias ffconf="nvim ~/.config/fastfetch/config.jsonc"
 alias g++="g++ -std=c++11"
+alias hook="curl -Lo .git/hooks/commit-msg https://review.lineageos.org/tools/hooks/commit-msg && chmod u+x .git/hooks/commit-msg"
 
 # Set bat theme
 BAT_THEME="Catppuccin Mocha"
 
+# openjdk path
+export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"
+
 # source env secrets
-source ~/.env
+[ -f ~/.env ] && source ~/.env
 
 function kat() {
+    if [ -z $kat_csrf_token ]; then
+        echo "Set \$kat_csrf_token"
+        return
+    fi
+
     if [ -z "$1" ]; then
         echo "Usage: $0 <file_path>"
-        exit 1
+        return
     fi
 
     if [ ! -f "$1" ]; then
         echo "File not found: $1"
-        exit 1
+        return
     fi
 
     paste_content=$(cat "$1")

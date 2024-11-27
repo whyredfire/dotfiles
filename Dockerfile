@@ -31,7 +31,8 @@ RUN git config --global user.email "karan@pixelos.net" && \
     git config --global alias.rb 'rebase' && \
     git config --global alias.rs 'reset' && \
     git config --global alias.ck 'checkout' && \
-    git config --global core.editor "nvim"
+    git config --global core.editor "nvim" && \
+    git config --global commit.verbose true
 
 # Set zsh as default shell
 CMD [ "zsh" ]
