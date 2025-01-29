@@ -10,9 +10,9 @@ window-width = 120
 
 macos-titlebar-style = transparent
 
-shell-integration-features = no-cursor
 cursor-style = block
 cursor-style-blink = false
+shell-integration-features = no-cursor
 
 mouse-hide-while-typing = true
 mouse-scroll-multiplier = 2
