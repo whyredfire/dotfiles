@@ -1,6 +1,7 @@
 return {
     {
         "nvim-tree/nvim-tree.lua",
+        commit = "85d1145ac71c1b8e1423862c78165a1f609faf60",
         cmd = { "NvimTreeToggle", "NvimTreeFocus" },
         opts = function()
             return require "plugins.configs.nvimtree"
