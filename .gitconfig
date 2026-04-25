@@ -6,12 +6,10 @@
 	rb = rebase
 	rs = reset
 	ck = checkout
-[credential]
-	helper = cache --timeout=99999999
 [core]
 	editor = nvim
 [user]
-	email = karan@pixelos.net
+	email = whyredfire@gmail.com
 	name = Karan Parashar
 [commit]
 	verbose = true

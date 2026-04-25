@@ -1,38 +1,57 @@
-FROM ubuntu:latest
+FROM alpine:latest AS builder
+RUN apk add --no-cache git build-base neovim curl zsh bash tmux
 
-# Install dependencies and clean up
-RUN apt-get update && apt-get upgrade -y && \
-    apt-get install -y curl gcc git nano wget neovim zsh zsh-autosuggestions zsh-syntax-highlighting && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+WORKDIR /root
+ARG ZSH_CUSTOM=/root/.oh-my-zsh/custom
+
+# Install Oh My Zsh
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+
+# Clone Plugins & Themes
+RUN git clone --depth 1 https://github.com/zsh-users/zsh-autosuggestions.git ${ZSH_CUSTOM}/plugins/zsh-autosuggestions && \
+    git clone --depth 1 https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM}/plugins/zsh-syntax-highlighting && \
+    git clone --depth 1 https://github.com/zsh-users/zsh-completions.git ${ZSH_CUSTOM}/plugins/zsh-completions && \
+    git clone --depth 1 https://github.com/tmux-plugins/tpm.git /root/.tmux/plugins/tpm && \
+    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM}/themes/powerlevel10k
+
+# Setup Tmux plugins in builder stage
+COPY .config/tmux /root/.config/tmux
+RUN /root/.tmux/plugins/tpm/bin/install_plugins
+
+# Setup Neovim plugins in builder stage
+COPY .config/nvim /root/.config/nvim
+RUN nvim --headless "+Lazy! sync" +qa && \
+    nvim --headless "+Lazy load nvim-treesitter" "+TSInstallSync! lua c javascript python bash" +qa
+
+# Final Image
+FROM alpine:latest
+RUN apk add --no-cache \
+    ca-certificates \
+    curl \
+    git \
+    neovim \
+    tmux \
+    zsh \
+    bat \
+    fastfetch \
+    bash
+
+# Set default shell to zsh for root
+RUN sed -i -e "s|root:/root:.*|root:/root:/bin/zsh|" /etc/passwd
+ENV SHELL=/bin/zsh
 
 WORKDIR /root
 
-# Install oh-my-zsh and plugins
-ARG ZSH_PATH=/root/.oh-my-zsh/custom/plugins
-RUN sh -c "$(wget -O- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" && \
-    git clone https://github.com/zsh-users/zsh-autosuggestions.git $ZSH_PATH/zsh-autosuggestions && \
-    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_PATH/zsh-syntax-highlighting && \
-    git clone https://github.com/zsh-users/zsh-completions.git $ZSH_PATH/zsh-completions && \
-    sed -i '/^plugins=(.*)$/s/plugins=(.*)/plugins=(git zsh-autosuggestions zsh-syntax-highlighting zsh-completions)/' ~/.zshrc
+# Copy Oh My Zsh and plugins from builder
+COPY --from=builder /root/.oh-my-zsh /root/.oh-my-zsh
+COPY --from=builder /root/.tmux /root/.tmux
 
-# Copy Neovim configuration
-RUN git clone https://github.com/whyredfire/dotfiles && \
-    mkdir -p ~/.config/nvim && \
-    cp -r dotfiles/.config/nvim/* ~/.config/nvim/ && \
-    rm -rf dotfiles
+# Copy local dotfiles
+COPY .zshrc .gitconfig .p10k.zsh* ./
+COPY .config/ .config/
 
-# Set git configs
-RUN git config --global user.email "karan@pixelos.net" && \
-    git config --global user.name "Karan Parashar" && \
-    git config --global alias.cp 'cherry-pick' && \
-    git config --global alias.c 'commit' && \
-    git config --global alias.f 'fetch' && \
-    git config --global alias.m 'merge' && \
-    git config --global alias.rb 'rebase' && \
-    git config --global alias.rs 'reset' && \
-    git config --global alias.ck 'checkout' && \
-    git config --global core.editor "nvim" && \
-    git config --global commit.verbose true
+# Copy built plugins (Neovim and Tmux) from builder
+COPY --from=builder /root/.local/share/nvim /root/.local/share/nvim
+COPY --from=builder /root/.config/tmux/plugins /root/.config/tmux/plugins
 
-# Set zsh as default shell
 CMD [ "zsh" ]
