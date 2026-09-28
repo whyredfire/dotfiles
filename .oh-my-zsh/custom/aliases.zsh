@@ -3,6 +3,7 @@ alias hook="curl -Lo .git/hooks/commit-msg https://review.pixelos.net/tools/hook
 
 # kubernetes
 alias k=kubectl
+alias kns='kubectl config set-context --current --namespace'
 alias kx=kubectx
 alias ks=kubeseal -o yaml
 
